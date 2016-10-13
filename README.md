@@ -5,3 +5,7 @@ This is the course project package for CS143 - Database Systems, which started o
 All the documents in this project belongs to our BUPT team, Yukai Tu and Cong Peng(me).
 
 ================update on 10/12/2016==============
+
+I have uploaded all the files for Project 1A and 4 in 5 files for Project 1B. I have also created two pages for this repository regarding of the overview and requirement for each project section.
+
+================update on 10/13/2016===============
