@@ -40,14 +40,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         print "Query failed: $errmsg <br />";
         exit(1);
     }else{
-        echo "Result:<br>";
-        while($row = $rs->fetch_array()) {
+	
+        print "<h3>Result from MySQL:</h3>";
+		print "<table border=1 cellspacing=1 cellpadding=2>";
+		$head = false;
+        while($row = $rs->fetch_assoc()) {
             //iterate the rows and print each attributes out
-            for($x = 0; $x < count($row); $x ++){
-                print "$row[$x] ";
+			if(!$head){
+				print "<tr align=center>";
+				$keys = array_keys($row);
+				foreach ($keys as $k){
+					print "<td><b>$k</b></td>";
+				}
+				print "</tr>";
+				$head = true;
+			}
+			print "<tr align=center>";
+			
+			
+            foreach ($row as $value){
+				if(empty($value)){
+					print "<td>N/A</td>";
+				}
+				else {
+					print "<td>$value</td>";
+				}
             }
-            echo "<br>";
+            print "</tr>";
+			
         }
+		echo "</table>";
         print 'Total results: ' . $rs->num_rows; 
     }
     
