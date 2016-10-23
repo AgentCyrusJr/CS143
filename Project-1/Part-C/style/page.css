@@ -1,0 +1,136 @@
+#navheader
+{
+	height:20px;
+	background:#576069;
+}
+.mainImgDiv
+{
+	
+	height:460px;
+	background-image:url(../img/mainBG3.jpg);
+	margin-top:10px;
+	background-position:46%;
+	/*background:url(./img/mainBG1.jpg);*/
+}
+.main-inner
+{
+	
+	float:left;
+	z-index:1;
+	
+
+}
+.schlogo
+{
+	margin-top:10px;
+}
+.formDiv
+{
+	
+	
+	float:left;
+	margin-top:-270px;
+	margin-left:-150px;
+	z-index:4;
+	
+	height:250px;
+	width:430px;
+	
+}
+.reg
+{
+	margin-left:220px;
+}
+.leg
+{
+	margin-top:20px;
+	font-size:24px;
+	margin-left:220px;
+	font-family:"Palatino Linotype", "Book Antiqua", Palatino, serif;
+}
+.log
+{
+	margin-left:40px;
+}
+.icon
+{
+	height:20px;
+	width:20px;
+}
+.login_input
+{
+	margin-top:10px;
+}
+.errorSpan
+{
+	margin-left:240px;
+	color:#F00;
+}
+.footer
+{
+	text-align:center;
+	height:40px;
+	background:#FFF;
+}
+.footer span
+{
+	margin:0px 30px;
+}
+.copyRight
+{
+	margin:0 auto;
+}
+.welcome
+{
+	margin-left:30px;
+}
+.container_760
+{
+	width:740px;
+	
+	/*border:2px solid red;*/
+}
+.logo_container
+{
+	width:740px;
+	background:#3284bf;
+	
+	/*border:2px solid red;*/
+}
+.divide_div
+{
+	text-align:center;
+}
+.Actortitle
+{
+	margin-top:30px;
+	font-size:30px;
+	
+	font-family:幼圆;
+}
+.dialog_title
+{
+	margin-top:10px;
+}
+.dialog_label
+{
+	margin-top:20px;
+}
+.Stubtn
+{
+	float:right;
+	margin-left:30px;
+}
+.add_actor
+{
+	float:left;
+}
+.searchForm
+{
+	
+	float:right;
+}
+.bg
+{
+	background:#F3F4F6;
+}
