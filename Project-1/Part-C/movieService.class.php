@@ -1,15 +1,16 @@
 <?php
 	require_once 'SqlTool.class.php';
 	require_once 'DivideTool.class.php';
+	require_once 'genreService.class.php';
 	//require 'config.php';
 	//业务逻辑类 主要完成对userlist表的操作
-	class actorService{
+	class movieService{
 	
 		//根据id删除用户
-		public function deleteActorByAid($aid)
+		public function deleteMovieByMid($mid)
 		{
 			$sqltool = new SqlTool();
-			$sql = "delete from Actor where id=$aid";
+			$sql = "delete from Movie where id=$mid";
 			if($sqltool->execute_dml($sql))
 			{
 				
@@ -25,9 +26,9 @@
 	
 		
 		//验证用户是否存在
-		function isExist($aid)
+		function isExist($mid)
 		{
-			$sql = "select * from Actor where id=$aid";
+			$sql = "select * from Movie where id=$mid";
 			$sqltool = new SqlTool();
 			$res = $sqltool->execute_dql2($sql);
 			//print_r($res);
@@ -38,36 +39,27 @@
 			return 1;
 			$sqltool->finish();
 		}
-
-		function getAllActors()
-		{
-			$sql = "select id,first,last from Actor";
-			$sqltool = new SqlTool();
-			$res = $sqltool->execute_dql2($sql);
-			return $res;
-			$sqltool->finish();
-		}
 		//插入新用户数据
-		function insertActor($last,$first,$sex,$dob,$dod)
+		function insertMovie($title,$year,$rating,$company,$genre)
 		{
-			$sql = "select max(id) from Actor";
+			$genreService = new genreService();
+			$sql = "select max(id) from Movie";
 			$sqltool = new SqlTool();
 			$res = $sqltool->execute_dql2($sql);
 			//print_r($res);
-			$aid = $res[0]['max(id)']+1;
+			$mid = $res[0]['max(id)']+1;
 			$sqltool = new SqlTool();
-			if(empty($dod)){
-				$sql = "insert into Actor(id,last,first,sex,dob) values($aid,'$last','$first','$sex','$dob')";
-			} else{
-				$sql = "insert into Actor(id,last,first,sex,dob,dod) values($aid,'$last','$first','$sex','$dob','$dod')";
-			//echo $sql;
-			}
-			//exit();
+			$sql = "insert into Movie(id,title,year,rating,company) values($mid, '$title','$year','$rating','$company')";
+			
 			$r = $sqltool->execute_dml($sql);
 			$sqltool->finish();
 			if($r==1)
-			{
-				return true;
+			{	
+				if ($genreService->insertGenre($mid,$genre)){
+					return true;
+				}else{
+					return false;
+				}
 			}
 			else
 			{
@@ -75,7 +67,16 @@
 			}
 			
 		}
-		function updateActor($aid,$last,$first,$sex,$dob,$dod)
+
+		function getMaxMovie() {
+			$sql = "select max(id) from Movie";
+			$sqltool = new SqlTool();
+			$res = $sqltool->execute_dql2($sql);
+			//print_r($res);
+			return $res[0]['max(id)'];
+		}
+
+		function updateMovie($aid,$last,$first,$sex,$dob,$dod)
 		{
 			$sqltool = new SqlTool();
 			$sql = "update Actor set last='$last',first='$first',sex='$sex',dob='$dob',dod='$dod' where id=$aid";
@@ -94,7 +95,7 @@
 		//获取userlist的总页数
 		function getPageCount($pageSize)
 		{
-			$sql = "select count(id) from Actor";
+			$sql = "select count(id) from Movie";
 			$sqltool = new SqlTool();
 			$res = $sqltool->execute_dql2($sql);
 		//	print_r($res);
@@ -111,19 +112,26 @@
 		}
 		//获取对应分页的雇员信息
 		function getUserlistByPage($pageNow,$pageSize){
-			$sql = "select * from Actor limit ".($pageNow-1)*$pageSize.",$pageSize";
+			$sql = "select * from Movie limit ".($pageNow-1)*$pageSize.",$pageSize";
 			$sqltool = new SqlTool();
 			$res = $sqltool->execute_dql2($sql);
 			return $res;
 			$sqltool->finish();
 		}
-		
+		function getAllMovies()
+		{
+			$sql = "select id,title from Movie";
+			$sqltool = new SqlTool();
+			$res = $sqltool->execute_dql2($sql);
+			return $res;
+			$sqltool->finish();
+		}
 		//封装的方式完成分页
 		
 		function getDivideTool($pageNow,$pageSize,$numOfNow)
 		{
 			$dividetool = new DivideTool();
-			$sql = "select count(id) from Actor";
+			$sql = "select count(id) from Movie";
 			$sqltool = new SqlTool();
 			$res = $sqltool->execute_dql2($sql);
 		//	print_r($res);
@@ -137,7 +145,7 @@
 				
 			}
 			//获取结果
-			$sql = "select * from Actor limit ".($pageNow-1)*$pageSize.",$pageSize";
+			$sql = "select * from Movie limit ".($pageNow-1)*$pageSize.",$pageSize";
 			$res = $sqltool->execute_dql2($sql);
 			//print_r($res);
 			//$numOfNow = $user_list_eachtime_page_count;

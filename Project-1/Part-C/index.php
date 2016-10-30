@@ -17,7 +17,19 @@
 
 
 
-<body class="bg" onLoad="clickCarousel();">
+<body class="bg" onLoad="<?php
+	 if($_GET['msg']==4)
+	 	echo "alert('insert failed')";
+	 if($_GET['msg']==8)
+	 	echo "alert('insert success')";
+	 if($_GET['msg']==5)
+	 	echo "alert('delete failed')";
+	 if($_GET['msg']==9)
+	 	echo "alert('add success')";
+	 if($_GET['msg']==10)
+	 	echo "alert('add failed')";
+	
+	?>;clickCarousel();">
 
 <?php
 
@@ -73,7 +85,7 @@ else {
     </ul>
     <div class="tab-content">
     	<div class="tab-pane <?php if($type==1) echo "active";?>" id="tab1">
-			       <?php require "search.php";?>
+			       <?php require "search_actor_movie.php";?>
         
         </div>
         <div class="tab-pane <?php if($type==2) echo "active";?>" id="tab2">
