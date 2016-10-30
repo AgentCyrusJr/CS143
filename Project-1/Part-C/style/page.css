@@ -134,3 +134,13 @@
 {
 	background:#F3F4F6;
 }
+
+.dialog_veri {
+	margin-left:-500px;
+	float:right;
+	font-size: 17px;
+}
+
+.Actortable {
+	width: 730px;
+}

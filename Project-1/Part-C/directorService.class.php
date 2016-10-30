@@ -3,63 +3,30 @@
 	require_once 'DivideTool.class.php';
 	//require 'config.php';
 	//业务逻辑类 主要完成对userlist表的操作
-	class actorService{
-	
-		//根据id删除用户
-		public function deleteActorByAid($aid)
-		{
-			$sqltool = new SqlTool();
-			$sql = "delete from Actor where id=$aid";
-			if($sqltool->execute_dml($sql))
-			{
-				
-					$sqltool->finish();
-					return 1;
-			}
-			else
-			{
-				$sqltool->finish();
-				return 0;
-			}
-		}
+	class directorService{
 	
 		
-		//验证用户是否存在
-		function isExist($aid)
+		function getAllDirectors()
 		{
-			$sql = "select * from Actor where id=$aid";
-			$sqltool = new SqlTool();
-			$res = $sqltool->execute_dql2($sql);
-			//print_r($res);
-			if(empty($res))
-			{
-				return 0;
-			}
-			return 1;
-			$sqltool->finish();
-		}
-
-		function getAllActors()
-		{
-			$sql = "select id,first,last from Actor";
+			$sql = "select id,first,last from Director";
 			$sqltool = new SqlTool();
 			$res = $sqltool->execute_dql2($sql);
 			return $res;
 			$sqltool->finish();
 		}
 		//插入新用户数据
-		function insertActor($last,$first,$sex,$dob,$dod)
+		function insertDirector($last,$first,$sex,$dob,$dod)
 		{
-			$sql = "select max(id) from Actor";
+			$sql = "select max(id) from Director";
 			$sqltool = new SqlTool();
 			$res = $sqltool->execute_dql2($sql);
 			//print_r($res);
 			$aid = $res[0]['max(id)']+1;
 			$sqltool = new SqlTool();
 			if(empty($dod)){
-				$sql = "insert into Actor(id,last,first,sex,dob) values($aid,'$last','$first','$sex','$dob')";
+				$sql = "insert into Director(id,last,first,sex,dob) values($aid,'$last','$first','$sex','$dob')";
 			} else{
-				$sql = "insert into Actor(id,last,first,sex,dob,dod) values($aid,'$last','$first','$sex','$dob','$dod')";
+				$sql = "insert into Director(id,last,first,sex,dob,dod) values($aid,'$last','$first','$sex','$dob','$dod')";
 			//echo $sql;
 			}
 			//exit();

@@ -16,14 +16,20 @@ $password = "";
 $dbname = "CS143"
 
 ?>
-<form method="post" action="<?php echo $_SERVER['PHP_SELF'];?>">
-  <h3>Search a Movie or an Actor:</h3>
-  <INPUT TYPE="checkbox" NAME="searchmovie" VALUE="on" > I want to search for a Movie
-  <INPUT TYPE="checkbox" NAME="searchactor" VALUE="on" > I want to search for an actor
-  <br><br>
-  <input type="text" name="search" placeholder="Search..." size=25 maxlength=30>
-  <br><br>
-  <input type="submit" value= "Done">
+ <div class="container_760">
+
+<h3>Search a Movie or an Actor:</h3>
+<hr>
+<form  class="form-horizontal" method="post" action="<?php echo $_SERVER['PHP_SELF'];?>">
+<div class="form-group">
+    <input type="hidden" value="on" name="searchmovie"/>
+    <input type="hidden" value="on" name="searchactor"/>
+</div>
+<div class="form-group">
+   <div class="input-append">
+    <input type="text" name="search" placeholder="Search..."><input type="submit" class="btn" value="Search">
+    </div>
+</div>
 </form>
 
 
@@ -49,12 +55,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit(1);
         }else{
             echo "<h4>Movie matches \"$searchname\":<br></h4>";
+            echo "<table class=\"Actortable table table-striped\">";
+            echo "<tr><th>ID</th><th>title</th><th>year</th><th>rating</th><th>company</th></tr>";
             while($row = $rs->fetch_array()) {
-                for($x = 0; $x < count($row); $x ++){
-                    print "$row[$x] ";
-                }
-                echo "<br>";
+                echo "<tr><td>{$row['id']}</td><td><a href=\"actorInfo.php?id={$row['title']}\">{$row['title']}</a></td><td>{$row['year']}</td><td>{$row['rating']}</td><td>{$row['company']}</td></tr>";
             }
+            echo "</table>";
             // print 'Total results: ' . $rs->num_rows; 
         }
     }
@@ -71,12 +77,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit(1);
         }else{
             echo "<h4>Actor/Actress matches \"$searchname\": <br></h4>";
+            echo "<table class=\"Actortable table table-striped\">";
+            echo "<tr><th>ID</th><th>name</th><th>sex</th><th>dob</th><th>dod</th></tr>";
+
             while($row = $rs->fetch_array()) {
-                for($x = 0; $x < count($row); $x ++){
-                    print "$row[$x] ";
+                if(empty($row['dod'])){
+                    $row['dod'] = "N/A";
                 }
-                echo "<br>";
+                echo "<tr><td>{$row['id']}</td><td><a href=\"actorInfo.php?id={$row['id']}\">{$row['last']} {$row['first']}</a></td><td>{$row['sex']}</td><td>{$row['dob']}</td><td>{$row['dod']}</td>";
             }
+            echo "</table>";
             // print 'Total results: ' . $rs->num_rows; 
         }
     }
@@ -84,6 +94,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
 }
 ?>
-
+</div>
 </body>
 </html>

@@ -24,15 +24,6 @@
 	{
 		$res = $dividetool->getRes();
 	}
-	else {
-		$Sinfo = $_GET['Ainfo'];
-		$sql = "select * from Actor where (id='$Ainfo') or (last='$Ainfo') or (first='$Ainfo') or (sex='$Ainfo')";
-		$sqltool = new SqlTool();
-		$res = $sqltool->execute_dql2($sql);
-		$sqltool->finish();
-	
-		//select * from Actor where (id='$Ainfo') or (last='$Ainfo') or (first='$Ainfo') or (sex='$Ainfo')
-	}
 	
 	//print_r($res);
 	?>
@@ -43,10 +34,11 @@
     <?php
 	echo "<p class=\"Actortitle\">Actors</p><hr/>";
 	?>
-	<a class="btn btn-success add_actor" href="#insert" data-toggle='modal'>Add Actors</a>
-	<form action="search_actor.php" class="searchForm" method="post">
+	<a class="btn btn-success add_actor" href="#insert" data-toggle='modal'>Add Actor/Director</a>
+	<form action="index.php?Type=1" class="searchForm" method="post">
 	<div class="input-append">
-	<input type="text" name="search_actor"><input type="submit" class="btn" value="search">
+	<input type="hidden" value="on" name="searchactor"/>
+	<input type="text" name="search"><input type="submit" class="btn" value="search">
 	</div>
 	</form>
 	<?php
@@ -57,14 +49,17 @@
 	else 
 	{
 			echo "<table class=\"Actortable table table-striped\">";
-			echo "<tr><th>ID</th><th>last</th><th>first</th><th>sex</th><th>dob</th><th>dod</th></tr>";
+			echo "<tr><th>ID</th><th>name</th><th>sex</th><th>dob</th><th>dod</th><th>delete</th></tr>";
 			//寰幆鏄剧ず
 			//print_r($res);
 			for($i=0;$i<count($res);$i++)
 			{
 				$row = $res[$i];
-				echo "<tr><td>{$row['id']}</td><td>{$row['last']}</td><td>{$row['first']}</td><td>{$row['sex']}</td>"
-				."<td><a href='#update' data-toggle='modal' onclick=\""."document.getElementById('Aid').value = {$row['id']};document.getElementById('Sname').value = '"."{$row['Sname']}"."';document.getElementById('Sage').value = {$row['Sage']};document.getElementById('Sdept').value = '"."{$row['Sdept']}"."';\"".">修改资料</a></td><td><a onclick='return confirmDele({$row['Sno']})' href='delete_stu.php?Sno={$row['Sno']}&page={$pageNow}'>删除学生</a></td></tr>";
+				if(empty($row['dod'])){
+					$row['dod'] = "N/A";
+				}
+				echo "<tr><td>{$row['id']}</td><td><a href=\"actorInfo.php?id={$row['id']}\">{$row['last']} {$row['first']}</a></td><td>{$row['sex']}</td><td>{$row['dob']}</td><td>{$row['dod']}</td>"
+				."<td><a onclick='return confirmDele({$row['id']})' href='delete_actor.php?Aid={$row['id']}&page={$pageNow}'>delete</a></td></tr>";
 			}
 			echo "</table>";
 	}
@@ -110,68 +105,44 @@
     }
     else
     {
-    	echo "<a href='main.php?actorPageNow=1&Type=1#foot'>返回 </a>";
+    	echo "<a href='index.php?actorPageNow=1&Type=2#foot'>return </a>";
     }
 	
 ?>
 
-<div class="modal hide fade" id="update">
-<div class="modal-headeer">
-<a href="#" class="close" data-dismiss="modal">×</a>
-<h5 class="dialog_title">学生信息修改</h5></div>
-<div class="modal-body">
-
-<form class="form-horizontal" action="update_stu.php" method="post" id="dialogform">
-
-
-
-<label class="dialog_label" >学号
-
-<input type="text" readonly="readonly" class="update_input" name="Sno" id="Sno"></label>
-
-<label class="dialog_label">姓名
-
-<input type="text" class="update_input" name="Sname" id="Sname"></label>
-<label class="dialog_label">年龄
-
-<input type="text" class="update_input" name="Sage" id="Sage"></label>
-<label class="dialog_label">专业
-
-<input type="text" class="update_input" name="Sdept" id="Sdept"></label>
-<input type="submit" name = "submit" class="dialog_label" value="修改"/>
-<input type="hidden" value="<?php echo $pageNow;?>" name="page"/>
- </form>
-</div>
- <div class="modal-footer">
-
- </div>
-
-</div>
-
 <div class="modal hide fade" id="insert">
 <div class="modal-headeer">
 <a href="#" class="close" data-dismiss="modal">×</a>
-<h5 class="dialog_title">添加学生信息</h5></div>
+<h5 class="dialog_title">Add New Actor/Director</h5></div>
 <div class="modal-body">
 
-<form class="form-horizontal" action="insert_stu.php" method="post" id="dialogform">
+<form class="form-horizontal" action="insert_actor.php" method="post" id="dialogform">
+	
+<div class="form-group">
+
+        <input type="radio" checked="checked" name="Aidentity" value="true"/>Actor
+        <input type="radio" name="Aidentity" value="false"/>Director
+</div>
+    <label class="dialog_label">First Name
+	<input type="text" class="update_input" name="AFname" ></label>
+
+	<label class="dialog_label">Last Name
+	<input type="text" class="update_input" name="ALname" ></label>
 
 
+	<div class="form-group">
+        <input type="radio" class="radio-inline" checked="checked" name="ASex" value="Male"/>Male
+        <input type="radio" class="radio-inline" name="Asex" value="Female"/>Female
+	</div>
 
-<label class="dialog_label" >学号
+	<label class="dialog_label">Date of Birth
+	<input type="date" class="update_input" name="ADoB" placeholder="YYYY-MM-DD"></label>
+	<p>ie: 1970-01-01</p>
+	<label class="dialog_label">Date of Death
+	<input type="date" class="update_input" name="ADoD" placeholder="YYYY-MM-DD"></label>
+	<p>(if alive, just leave blank)</p>
 
-<input type="text" class="update_input" name="Sno"></label>
-
-<label class="dialog_label">姓名
-
-<input type="text" class="update_input" name="Sname" ></label>
-<label class="dialog_label">年龄
-
-<input type="text" class="update_input" name="Sage" ></label>
-<label class="dialog_label">专业
-
-<input type="text" class="update_input" name="Sdept" ></label>
-<input type="submit" name = "submit" class="dialog_label" value="添加"/>
+<input type="submit" name = "submit" class="dialog_label" value="add"/>
 <input type="hidden" value="<?php echo $pageNow;?>" name="page"/>
  </form>
 </div>
