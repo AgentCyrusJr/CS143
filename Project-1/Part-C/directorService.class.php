@@ -24,11 +24,12 @@
 			$aid = $res[0]['max(id)']+1;
 			$sqltool = new SqlTool();
 			if(empty($dod)){
-				$sql = "insert into Director(id,last,first,sex,dob) values($aid,'$last','$first','$sex','$dob')";
+				$sql = "insert into Director(id,last,first,dob) values($aid,'$last','$first','$dob')";
 			} else{
-				$sql = "insert into Director(id,last,first,sex,dob,dod) values($aid,'$last','$first','$sex','$dob','$dod')";
-			//echo $sql;
+				$sql = "insert into Director(id,last,first,dob,dod) values($aid,'$last','$first','$dob','$dod')";
+			//
 			}
+			//echo $sql;
 			//exit();
 			$r = $sqltool->execute_dml($sql);
 			$sqltool->finish();

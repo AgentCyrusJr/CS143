@@ -58,7 +58,7 @@
 				if(empty($row['dod'])){
 					$row['dod'] = "N/A";
 				}
-				echo "<tr><td>{$row['id']}</td><td><a href=\"actorInfo.php?id={$row['id']}\">{$row['last']} {$row['first']}</a></td><td>{$row['sex']}</td><td>{$row['dob']}</td><td>{$row['dod']}</td>"
+				echo "<tr><td>{$row['id']}</td><td><a href=\"show_actor.php?aid={$row['id']}\">{$row['last']} {$row['first']}</a></td><td>{$row['sex']}</td><td>{$row['dob']}</td><td>{$row['dod']}</td>"
 				."<td><a onclick='return confirmDele({$row['id']})' href='delete_actor.php?Aid={$row['id']}&page={$pageNow}'>delete</a></td></tr>";
 			}
 			echo "</table>";
@@ -132,7 +132,7 @@
 
 	<div class="form-group">
         <input type="radio" class="radio-inline" checked="checked" name="ASex" value="Male"/>Male
-        <input type="radio" class="radio-inline" name="Asex" value="Female"/>Female
+        <input type="radio" class="radio-inline" name="ASex" value="Female"/>Female
 	</div>
 
 	<label class="dialog_label">Date of Birth

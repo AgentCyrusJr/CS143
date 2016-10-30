@@ -16,8 +16,11 @@
 	//echo $b;
 	//echo "12";
 	//echo $Adob,$Adod;
-	if($isActor)
+	//echo $isActor;
+	//exit();
+	if($isActor=='true')
 	{
+
 		if($actorService->insertActor($Alname,$Afname,$Asex,$Adob,$Adod))
 		{
 			header("Location:index.php?actorPageNow=$actorPageNow&Type=2&msg=8#foot");
@@ -29,6 +32,7 @@
 		}
 	}
 	else {
+
 		if($directorService->insertDirector($Alname,$Afname,$Asex,$Adob,$Adod))
 		{
 			header("Location:index.php?actorPageNow=$actorPageNow&Type=2&msg=8#foot");

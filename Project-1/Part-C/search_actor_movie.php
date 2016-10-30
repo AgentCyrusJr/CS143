@@ -58,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo "<table class=\"Actortable table table-striped\">";
             echo "<tr><th>ID</th><th>title</th><th>year</th><th>rating</th><th>company</th></tr>";
             while($row = $rs->fetch_array()) {
-                echo "<tr><td>{$row['id']}</td><td><a href=\"actorInfo.php?id={$row['title']}\">{$row['title']}</a></td><td>{$row['year']}</td><td>{$row['rating']}</td><td>{$row['company']}</td></tr>";
+                echo "<tr><td>{$row['id']}</td><td><a href=\"show_movie.php?mid={$row['id']}\">{$row['title']}</a></td><td>{$row['year']}</td><td>{$row['rating']}</td><td>{$row['company']}</td></tr>";
             }
             echo "</table>";
             // print 'Total results: ' . $rs->num_rows; 
@@ -70,7 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $searchname = $_REQUEST["search"];
         //search by name 
         //'%$searchname%' means any string which constains searchname, currently it is not case sensitive
-        $query = "select * from Actor where first like '%$searchname%'  or last like '%$searchname%'";
+        $query = "select * from Actor where  concat(first,' ',last) like '%$searchname%'";
         if (!($rs = $db->query($query))){ 
             $errmsg = $db->error;
             print "Query failed: $errmsg <br/>";
@@ -84,7 +84,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 if(empty($row['dod'])){
                     $row['dod'] = "N/A";
                 }
-                echo "<tr><td>{$row['id']}</td><td><a href=\"actorInfo.php?id={$row['id']}\">{$row['last']} {$row['first']}</a></td><td>{$row['sex']}</td><td>{$row['dob']}</td><td>{$row['dod']}</td>";
+                echo "<tr><td>{$row['id']}</td><td><a href=\"show_actor.php?aid={$row['id']}\">{$row['last']} {$row['first']}</a></td><td>{$row['sex']}</td><td>{$row['dob']}</td><td>{$row['dod']}</td>";
             }
             echo "</table>";
             // print 'Total results: ' . $rs->num_rows; 

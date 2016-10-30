@@ -17,19 +17,7 @@
 
 
 
-<body class="bg" onLoad="<?php
-	 if($_GET['msg']==4)
-	 	echo "alert('insert failed')";
-	 if($_GET['msg']==8)
-	 	echo "alert('insert success')";
-	 if($_GET['msg']==5)
-	 	echo "alert('delete failed')";
-	 if($_GET['msg']==9)
-	 	echo "alert('add success')";
-	 if($_GET['msg']==10)
-	 	echo "alert('add failed')";
-	
-	?>;clickCarousel();">
+<body class="bg" onLoad="clickCarousel();">
 
 <?php
 
@@ -120,6 +108,7 @@ else {
 
 require("footer.php");
 ?>
+</div>
 
 <script src="js/jquery-1.7.2.min.js"></script> 
 <script src="js/bootstrap.min.js"></script>

@@ -59,7 +59,7 @@
 				if(empty($row['dod'])){
 					$row['dod'] = "N/A";
 				}
-				echo "<tr><td>{$row['id']}</td><td><a href=\"actorInfo.php?id={$row['title']}\">{$row['title']}</a></td><td>{$row['year']}</td><td>{$row['rating']}</td><td>{$row['company']}</td>"
+				echo "<tr><td>{$row['id']}</td><td><a href=\"show_movie.php?mid={$row['id']}\">{$row['title']}</a></td><td>{$row['year']}</td><td>{$row['rating']}</td><td>{$row['company']}</td>"
 				."<td><a onclick='return confirmDele({$row['id']})' href='delete_movie.php?Mid={$row['id']}&page={$pageNow}'>delete</a></td></tr>";
 			}
 			echo "</table>";
@@ -140,29 +140,34 @@
         </select>
 	</label>
     </div>
+
+
     <div class="form-group">
 	<label class="dialog_label">Movie Genre:
-        <select  class="form-control" name="MGenre">
-            <option value="Action">Action</option>
-            <option value="Adult">Adult</option>
-            <option value="Adventure">Adventure</option>
-            <option value="Animation">Animation</option>
-            <option value="Comedy">Comedy</option>
-            <option value="Crime">Crime</option>
-            <option value="Documentary">Documentary</option>
-            <option value="Drama">Drama</option>
-            <option value="Family">Family</option>
-            <option value="Fantasy">Fantasy</option>
-            <option value="Horror">Horror</option>
-            <option value="Musical">Musical</option>
-            <option value="Mystery">Mystery</option>
-            <option value="Romance">Romance</option>
-            <option value="Sci-Fi">Sci-Fi</option>
-            <option value="Short">Short</option>
-            <option value="Thriller">Thriller</option>
-            <option value="War">War</option>
-            <option value="Western">Western</option>
-        </select>   
+        	<input type="checkbox" name="genre[]" value="Action">Action</input>
+        	<input type="checkbox" name="genre[]" value="Adult">Adult</input>
+			<input type="checkbox" name="genre[]" value="Adventure">Adventure</input>
+
+			<input type="checkbox" name="genre[]" value="Animation">Animation</input>
+
+			<input type="checkbox" name="genre[]" value="Comedy">Comedy</input>
+
+			<input type="checkbox" name="genre[]" value="Crime">Crime</input>
+
+			<input type="checkbox" name="genre[]" value="Documentary">Documentary</input>
+			<input type="checkbox" name="genre[]" value="Drama">Drama</input>
+
+			<input type="checkbox" name="genre[]" value="Family">Family</input>
+			<input type="checkbox" name="genre[]" value="Fantasy">Fantasy</input>
+			<input type="checkbox" name="genre[]" value="Horror">Horror</input>
+			<input type="checkbox" name="genre[]" value="Musical">Musical</input>
+			<input type="checkbox" name="genre[]" value="Mystery">Mystery</input>
+			<input type="checkbox" name="genre[]" value="Romance">Romance</input>
+			<input type="checkbox" name="genre[]" value="Sci-Fi">Sci-Fi</input>
+			<input type="checkbox" name="genre[]" value="Short">Short</input>
+			<input type="checkbox" name="genre[]" value="Thriller">Thriller</input>
+			<input type="checkbox" name="genre[]" value="War">War</input>
+			<input type="checkbox" name="genre[]" value="Western">Western</input>
    </label>
     </div>
 
