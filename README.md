@@ -13,3 +13,7 @@ I have uploaded all the files for Project 1A and 4 in 5 files for Project 1B. I 
 Yukai Tu fixed some problems and pulled all required documents on this repository. Wait for my check.
 
 ================update on 10/15/2016===============
+
+Finished P1C, waiting for submission. Further testcases need to be designed to check its correctness. 
+
+================update on 10/31/2016================
