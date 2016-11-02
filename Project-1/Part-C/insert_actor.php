@@ -6,18 +6,16 @@
 	$Adob = $_POST['ADoB'];
 	$Adod = $_POST['ADoD'];
 	$actorPageNow = $_POST['page'];
+
 	require 'actorService.class.php';
 	require 'directorService.class.php';
 	require 'config.php';
-	
 	//echo "$Sno $Sname $Sage $Sdept";
 	$actorService = new actorService();
 	$directorService = new directorService();
 	//echo $b;
 	//echo "12";
 	//echo $Adob,$Adod;
-	//echo $isActor;
-	//exit();
 	if($isActor=='true')
 	{
 

@@ -19,7 +19,7 @@
 		function insertDirector($last,$first,$sex,$dob,$dod)
 		{
 			$maxpersonidService = new maxPersonIDService();
-			$res = $maxpersonidService->getMaxMovieId();
+			$res = $maxpersonidService->getMaxPersonID();
 			//print_r($res);
 			$aid = $res[0]['id']+1;
 			$sqltool = new SqlTool();
@@ -44,22 +44,6 @@
 			}
 			
 		}
-		function updateActor($aid,$last,$first,$sex,$dob,$dod)
-		{
-			$sqltool = new SqlTool();
-			$sql = "update Actor set last='$last',first='$first',sex='$sex',dob='$dob',dod='$dod' where id=$aid";
-			$r = $sqltool->execute_dml($sql);
-			$sqltool->finish();
-			if($r==1)
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-		
 
 		function getPageCount($pageSize)
 		{

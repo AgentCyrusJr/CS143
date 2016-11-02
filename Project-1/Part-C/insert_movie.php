@@ -19,11 +19,11 @@
 	if($movieService->insertMovie($Mtitle,$Myear,$Mrate,$Mcompany,$Mgenre))
 	{
 
-		header("Location:index.php?moviePageNow=$moviePageNow&Type=2&msg=8#foot");
+		header("Location:index.php?moviePageNow=$moviePageNow&Type=3&msg=8#foot");
 		exit();
 	}
 	else {
-		header("Location:index.php?moviePageNow=$moviePageNow&Type=2&msg=4#foot");
+		header("Location:index.php?moviePageNow=$moviePageNow&Type=3&msg=4#foot");
 		exit();
 	}
 	

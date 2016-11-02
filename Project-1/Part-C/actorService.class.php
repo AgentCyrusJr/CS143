@@ -51,7 +51,7 @@
 		function insertActor($last,$first,$sex,$dob,$dod)
 		{
 			$maxpersonidService = new maxPersonIDService();
-			$res = $maxpersonidService->getMaxMovieId();
+			$res = $maxpersonidService->getMaxPersonID();
 			//print_r($res);
 			//print_r($res);
 			$aid = $res[0]['id']+1;
