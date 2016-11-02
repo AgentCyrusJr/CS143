@@ -2,12 +2,11 @@
 
 	require_once 'config.php';
 	class DivideTool{
-		public $pageCount;	//����õ�ҳ������
-		public $res_array;  //���صĽ��
-		public $rowCount;  //��ݿ��ѯ�������
-		//public $pageNow;	//��ǰҳ�棬���ⲿ����
-		public $navigator; //���ص�����
-		public $pageSize;	//�ⲿ����ÿҳ�������
+		public $pageCount;	
+		public $res_array;  
+		public $rowCount;  
+		public $navigator; 
+		public $pageSize;	
 		public $count;
 		
 		/**

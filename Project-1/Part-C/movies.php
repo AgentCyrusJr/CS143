@@ -7,7 +7,7 @@
 	require_once("config.php");
 	require_once("DivideTool.class.php");
 	require_once("SqlTool.class.php");
-	//当前页〉
+
 	$pageNow = 1;
 	
 	if(!empty($_GET['moviePageNow']))
@@ -51,8 +51,7 @@
 	{
 			echo "<table class=\"Actortable table table-striped\">";
 			echo "<tr><th>ID</th><th>title</th><th>year</th><th>rating</th><th>company</th><th>delete</th></tr>";
-			//寰幆鏄剧ず
-			//print_r($res);
+		
 			for($i=0;$i<count($res);$i++)
 			{
 				$row = $res[$i];
@@ -64,7 +63,7 @@
 			}
 			echo "</table>";
 	}
-	//鎵撳嵃椤电爜鐨勮秴閾炬帴
+
 	/*for($i=1;$i<=$pageCount;$i++)
 	{
 		echo "<a href='userList.php?pageNow=$i'>$i</a>  ";

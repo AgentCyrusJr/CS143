@@ -1,8 +1,7 @@
 <?php
 	require_once 'SqlTool.class.php';
 	require_once 'DivideTool.class.php';
-	//require 'config.php';
-	//业务逻辑类 主要完成对userlist表的操作
+
 	class directorMovieService{
 		public function insertMovieDirector($mid,$did)
 		{

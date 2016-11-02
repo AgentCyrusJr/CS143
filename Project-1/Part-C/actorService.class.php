@@ -1,11 +1,11 @@
 <?php
 	require_once 'SqlTool.class.php';
 	require_once 'DivideTool.class.php';
+	require_once 'maxpersonIDService.class.php';
 	//require 'config.php';
-	//业务逻辑类 主要完成对userlist表的操作
+	
 	class actorService{
 	
-		//根据id删除用户
 		public function deleteActorByAid($aid)
 		{
 			$sqltool = new SqlTool();
@@ -24,7 +24,7 @@
 		}
 	
 		
-		//验证用户是否存在
+
 		function isExist($aid)
 		{
 			$sql = "select * from Actor where id=$aid";
@@ -47,14 +47,14 @@
 			return $res;
 			$sqltool->finish();
 		}
-		//插入新用户数据
+
 		function insertActor($last,$first,$sex,$dob,$dod)
 		{
-			$sql = "select max(id) from Actor";
-			$sqltool = new SqlTool();
-			$res = $sqltool->execute_dql2($sql);
+			$maxpersonidService = new maxPersonIDService();
+			$res = $maxpersonidService->getMaxMovieId();
 			//print_r($res);
-			$aid = $res[0]['max(id)']+1;
+			//print_r($res);
+			$aid = $res[0]['id']+1;
 			$sqltool = new SqlTool();
 			if(empty($dod)){
 				$sql = "insert into Actor(id,last,first,sex,dob) values($aid,'$last','$first','$sex','$dob')";
@@ -67,6 +67,7 @@
 			$sqltool->finish();
 			if($r==1)
 			{
+				$maxpersonidService->updateMaxPersonID($aid);
 				return true;
 			}
 			else
@@ -91,7 +92,7 @@
 			}
 		}
 		
-		//获取userlist的总页数
+	
 		function getPageCount($pageSize)
 		{
 			$sql = "select count(id) from Actor";
@@ -109,7 +110,7 @@
 			
 			return $pageCount;
 		}
-		//获取对应分页的雇员信息
+	
 		function getUserlistByPage($pageNow,$pageSize){
 			$sql = "select * from Actor limit ".($pageNow-1)*$pageSize.",$pageSize";
 			$sqltool = new SqlTool();
@@ -117,8 +118,7 @@
 			return $res;
 			$sqltool->finish();
 		}
-		
-		//封装的方式完成分页
+	
 		
 		function getDivideTool($pageNow,$pageSize,$numOfNow)
 		{
@@ -129,14 +129,13 @@
 		//	print_r($res);
 			if($row = $res[0])
 			{
-				//获取总行数
+				
 				$rowC = $row['count(id)'];
-				//print_r($row);
-				//获取总页数
+				
 				$pageCount=ceil($row['count(id)']/$pageSize);
 				
 			}
-			//获取结果
+		
 			$sql = "select * from Actor limit ".($pageNow-1)*$pageSize.",$pageSize";
 			$res = $sqltool->execute_dql2($sql);
 			//print_r($res);

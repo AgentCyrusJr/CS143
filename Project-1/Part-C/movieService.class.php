@@ -2,11 +2,11 @@
 	require_once 'SqlTool.class.php';
 	require_once 'DivideTool.class.php';
 	require_once 'genreService.class.php';
-	//require 'config.php';
-	//业务逻辑类 主要完成对userlist表的操作
+	require_once 'maxmovieIDService.class.php';
+
 	class movieService{
 	
-		//根据id删除用户
+
 		public function deleteMovieByMid($mid)
 		{
 			$sqltool = new SqlTool();
@@ -24,8 +24,7 @@
 			}
 		}
 	
-		
-		//验证用户是否存在
+
 		function isExist($mid)
 		{
 			$sql = "select * from Movie where id=$mid";
@@ -39,22 +38,21 @@
 			return 1;
 			$sqltool->finish();
 		}
-		//插入新用户数据
+
 		function insertMovie($title,$year,$rating,$company,$genre)
 		{
 			$genreService = new genreService();
-			$sql = "select max(id) from Movie";
-			$sqltool = new SqlTool();
-			$res = $sqltool->execute_dql2($sql);
+			$maxmovieidService = new maxMovieIDService();
+			$res = $maxmovieidService->getMaxMovieId();
 			//print_r($res);
-			$mid = $res[0]['max(id)']+1;
+			$mid = $res[0]['id']+1;
 			$sqltool = new SqlTool();
 			$sql = "insert into Movie(id,title,year,rating,company) values($mid, '$title','$year','$rating','$company')";
-			
 			$r = $sqltool->execute_dml($sql);
 			$sqltool->finish();
 			if($r==1)
 			{	
+				$maxmovieidService->updateMaxMovieID($mid);
 				if ($genreService->insertGenre($mid,$genre)){
 					return true;
 				}else{
@@ -92,7 +90,6 @@
 			}
 		}
 		
-		//获取userlist的总页数
 		function getPageCount($pageSize)
 		{
 			$sql = "select count(id) from Movie";
@@ -110,7 +107,7 @@
 			
 			return $pageCount;
 		}
-		//获取对应分页的雇员信息
+
 		function getUserlistByPage($pageNow,$pageSize){
 			$sql = "select * from Movie limit ".($pageNow-1)*$pageSize.",$pageSize";
 			$sqltool = new SqlTool();
@@ -126,7 +123,7 @@
 			return $res;
 			$sqltool->finish();
 		}
-		//封装的方式完成分页
+
 		
 		function getDivideTool($pageNow,$pageSize,$numOfNow)
 		{
@@ -137,14 +134,13 @@
 		//	print_r($res);
 			if($row = $res[0])
 			{
-				//获取总行数
+			
 				$rowC = $row['count(id)'];
-				//print_r($row);
-				//获取总页数
+				
 				$pageCount=ceil($row['count(id)']/$pageSize);
 				
 			}
-			//获取结果
+		
 			$sql = "select * from Movie limit ".($pageNow-1)*$pageSize.",$pageSize";
 			$res = $sqltool->execute_dql2($sql);
 			//print_r($res);

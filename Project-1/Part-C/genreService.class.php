@@ -2,7 +2,7 @@
 	require_once 'SqlTool.class.php';
 	require_once 'DivideTool.class.php';
 	//require 'config.php';
-	//业务逻辑类 主要完成对userlist表的操作
+
 	class genreService{
 		public function deleteGenreByMid($mid)
 		{
@@ -21,8 +21,7 @@
 			}
 		}
 	
-		
-		//验证用户是否存在
+
 		function isExist($mid)
 		{
 			$sql = "select * from MovieGenre where mid=$mid";
@@ -36,7 +35,7 @@
 			return 1;
 			$sqltool->finish();
 		}
-		//插入新用户数据
+
 		function insertGenre($mid,$genre)
 		{
 			$sqltool = new SqlTool();

@@ -19,9 +19,7 @@
 			mysql_query("set names utf8");
 		}
 		
-	
-	
-		//鏂规硶
+
 	
 		//1.dql
 		public function execute_dql($sql){
@@ -42,11 +40,6 @@
 			return $arr;
 		}
 		
-		//分页查询方法
-		public function execute_dql_divede($sql1,$sql2,&$dividetool)
-		{
-			
-		}
 		
 		//2.update,delete , insert dml
 		public function execute_dml($sql){
