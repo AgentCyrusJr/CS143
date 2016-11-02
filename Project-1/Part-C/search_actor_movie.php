@@ -48,7 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $searchname = $_REQUEST["search"];
         //search by name 
         //'%$searchname%' means any string which constains searchname, currently it is not case sensitive
-        $query = "select * from Movie where title like '%$searchname%'";
+        $query = "select * from Movie where title like '%$searchname%' order by title ASC";
         if (!($rs = $db->query($query))){ 
             $errmsg = $db->error;
             print "Query failed: $errmsg <br />";
@@ -70,7 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $searchname = $_REQUEST["search"];
         //search by name 
         //'%$searchname%' means any string which constains searchname, currently it is not case sensitive
-        $query = "select * from Actor where  concat(first,' ',last) like '%$searchname%'";
+        $query = "select * from Actor where  concat(first,' ',last) like '%$searchname%' order by first ASC";
         if (!($rs = $db->query($query))){ 
             $errmsg = $db->error;
             print "Query failed: $errmsg <br/>";
