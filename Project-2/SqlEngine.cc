@@ -132,45 +132,34 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
 
 RC SqlEngine::load(const string& table, const string& loadfile, bool index)
 {
-  /* your code here */
-	RecordFile wf;
-	ifstream rf(loadfile.c_str());
-	if ((rc = wf.open(table + ".tbl", 'w') < 0)) {
-		fprintf(stderr, "Error: table %s file could not be opened for writing\n", table.c_str());
-		wf.close();
-		return rc;
-	}
+  //by ACJ 2016/11/05
+	//create a RecordFile class, and name it as <tablename> + ".tbl"
+	RecordFile new_table;
+	new_table.open(table + ".tbl", 'w');
 
-	RC rc = 0;
-	if (!rf.is_open()) {
-		fprintf(stderr, "Error: record %s file could not be opening for reading\n", loadfile.c_str());
-		wf.close();
-		rf.close();
-		return RC_FILE_OPEN_FAILED;
-	}
-	while (!rf.eof()) {
-		getline(rf, line);
-		if (!line.empty()) {
-			rc = parseLoadLine(line, key, value);
-			if (rc != 0) { // parseLoadLine failed
-				fprintf(stderr, "Error: cannot parse load line\n");
-				wf.close();
-				rf.close();
-				return rc;
-			}
-			else { 
-				rc = wf.append(key, value, rid);
-				if (rc != 0) { // append line failed
-					fprintf(stderr, "Error: cannot append value to record file\n");
-					wf.close();
-					rf.close();
-					return rc;
-				}
-			}
+	// Open the file required to be loaded
+	ifstream current_file(loadfile.c_str());
+
+	// Read file 
+	if (current_file.is_open()) {
+
+		string current_line;
+		int key;
+		string value;
+		RecordId rid = new_table.endRid();
+
+		while (!current_file.eof()) {
+			getline(current_file, current_line);
+			//SqlEngine::parseLoadLine
+			parseLoadLine(current_line, key, value);
+			new_table.append(key, value, rid);
+			rid++;
 		}
 	}
-	wf.close();
-	rf.close();
+
+	// Close file and table
+	current_file.close();
+	new_table.close();
 
 	return 0;
 }
