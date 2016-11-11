@@ -13,11 +13,16 @@
 #include "RecordFile.h"
 #include "PageFile.h"
 
+
 /**
  * BTLeafNode: The class representing a B+tree leaf node.
  */
 class BTLeafNode {
   public:
+
+    // maximum keys in node
+    static const int MAX_KEY_NUM = 80;
+
    /**
     * Insert the (key, rid) pair to the node.
     * Remember that all keys inside a B+tree node should be kept sorted.
@@ -27,6 +32,9 @@ class BTLeafNode {
     */
     RC insert(int key, const RecordId& rid);
 
+    RC insertToSlot(int key, const RecordId& rid, char* ptr, int length);
+
+    RC insertToNode(int key, const RecordId& rid);
    /**
     * Insert the (key, rid) pair to the node
     * and split the node half and half with sibling.
@@ -53,6 +61,8 @@ class BTLeafNode {
     */
     RC locate(int searchKey, int& eid);
 
+    RC binaryLocate(int searchKey, int& eid, int begin, int end);
+
    /**
     * Read the (key, rid) pair from the eid entry.
     * @param eid[IN] the entry number to read the (key, rid) pair from
@@ -61,6 +71,8 @@ class BTLeafNode {
     * @return 0 if successful. Return an error code if there is an error.
     */
     RC readEntry(int eid, int& key, RecordId& rid);
+
+    char* slotPtr(int n);
 
    /**
     * Return the pid of the next slibling node.
@@ -98,6 +110,8 @@ class BTLeafNode {
     */
     RC write(PageId pid, PageFile& pf);
 
+    RC write(char* ptr, int size);
+
   private:
    /**
     * The main memory buffer for loading the content of the disk page 
@@ -112,6 +126,8 @@ class BTLeafNode {
  */
 class BTNonLeafNode {
   public:
+    // maximum keys in node
+    static const int MAX_KEY_NUM = 120;
    /**
     * Insert a (key, pid) pair to the node.
     * Remember that all keys inside a B+tree node should be kept sorted.
@@ -120,6 +136,10 @@ class BTNonLeafNode {
     * @return 0 if successful. Return an error code if the node is full.
     */
     RC insert(int key, PageId pid);
+
+    RC insertToSlot(int key, const PageId pid, char* ptr, int length);
+
+    RC insertToNode(int key, PageId pid);
 
    /**
     * Insert the (key, pid) pair to the node
@@ -144,6 +164,8 @@ class BTNonLeafNode {
     * @return 0 if successful. Return an error code if there is an error.
     */
     RC locateChildPtr(int searchKey, PageId& pid);
+
+    char* slotPtr(int n);
 
    /**
     * Initialize the root node with (pid1, key, pid2).
@@ -175,6 +197,8 @@ class BTNonLeafNode {
     * @return 0 if successful. Return an error code if there is an error.
     */
     RC write(PageId pid, PageFile& pf);
+
+    RC write(char* ptr, int size);
 
   private:
    /**
