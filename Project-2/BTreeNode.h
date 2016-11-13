@@ -13,6 +13,7 @@
 #include "RecordFile.h"
 #include "PageFile.h"
 
+#define MAX_KEY_NUM 80; // maximum keys in node
 
 /**
  * BTLeafNode: The class representing a B+tree leaf node.
@@ -21,7 +22,7 @@ class BTLeafNode {
   public:
 
     // maximum keys in node
-    static const int MAX_KEY_NUM = 80;
+    //static const int MAX_KEY_NUM = 80;
 
    /**
     * Insert the (key, rid) pair to the node.
