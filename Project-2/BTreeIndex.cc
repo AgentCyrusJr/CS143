@@ -29,7 +29,26 @@ BTreeIndex::BTreeIndex()
  */
 RC BTreeIndex::open(const string& indexname, char mode)
 {
-    return 0;
+	char buffer[PageFile::PAGE_SIZE]; 
+	//fail to open
+	if (pf.open(indexname, mode) < 0) 
+		return pf.open(indexname, mode);
+
+	if (pf.endPid() == 0) {
+		rootPid = -1;
+		treeHeight = 0;
+		close();
+		return open(indexname, mode);
+	}
+	else {
+		//fail to read
+		if (pf.read(0, buffer) < 0) return pf.read(0, buffer);
+
+		memcpy(&rootPid, buffer, sizeof(PageId));
+		memcpy(&treeHeight, buffer + sizeof(PageId), sizeof(int));
+	}
+
+	return 0;
 }
 
 /*
@@ -38,7 +57,12 @@ RC BTreeIndex::open(const string& indexname, char mode)
  */
 RC BTreeIndex::close()
 {
-    return 0;
+	char buffer[PageFile::PAGE_SIZE]; 
+	memcpy(buffer, &rootPid, sizeof(PageId));
+	memcpy(buffer + sizeof(PageId), &treeHeight, sizeof(int));
+	if (pf.write(0, buffer) < 0) 
+		return pf.write(0, buffer);
+	return pf.close(); 
 }
 
 /*
@@ -49,7 +73,95 @@ RC BTreeIndex::close()
  */
 RC BTreeIndex::insert(int key, const RecordId& rid)
 {
-    return 0;
+	if (treeHeight == 0) { 
+		BTLeafNode leafnode = BTLeafNode();
+		leafnode.insert(key, rid);
+		rootPid = pf.endPid();
+		leafnode.write(rootPid, pf);
+		treeHeight++; 
+		return 0;
+	}
+	else {
+		int ikey;
+		PageId ipid;
+		int result = helper(key, rid, 1, rootPid, ikey, ipid);
+		//if the inserted node is to split first 
+		if (result == 1) { 
+			BTNonLeafNode parentnode = BTNonLeafNode();
+			parentnode.initializeRoot(rootPid, ikey, ipid);
+			rootPid = pf.endPid();
+			parentnode.write(rootPid, pf);
+			treeHeight++;
+			return 0;
+		}
+		else if (result == 0) 
+			return 0;
+		else
+			return -1;
+	}
+
+}
+
+/**
+ * help function
+ */
+RC BTreeIndex::helper(int& key, const RecordId& rid, int height, PageId currentPid, int& ikey, PageId& ipid) {
+	//If it is already at the leaf level
+	if (height == treeHeight) { 
+		BTLeafNode leafnode = BTLeafNode();
+		leafnode.read(currentPid, pf);
+		//There is enough space for this insertion in the leafnode
+		if (leafnode.getKeyCount() < N_KEY-1) { //Max. number of keys for leaf nodes	
+			leafnode.insert(key, rid);
+			leafnode.write(currentPid, pf);
+			return 0;
+		}
+		else {
+			BTLeafNode siblingnode = BTLeafNode();
+
+			leafnode.insertAndSplit(key, rid, siblingnode, ikey); 
+			ipid = pf.endPid();
+			siblingnode.setNextNodePtr(leafnode.getNextNodePtr());
+			leafnode.setNextNodePtr(ipid);
+			leafnode.write(currentPid, pf);
+			siblingnode.write(ipid, pf);
+			return 1;
+		}
+
+	}
+	else { //NonLeaf level
+		BTNonLeafNode nonleafnode = BTNonLeafNode();
+		nonleafnode.read(currentPid, pf);
+		PageId childpid;
+		nonleafnode.locateChildPtr(key, childpid);
+
+		int result = helper(key, rid, height + 1, childpid, ikey, ipid);
+		if (result < 0)
+			return -1;
+		else if (result == 1) { //if overflow
+			//enough space for this node
+			if (nonleafnode.getKeyCount() < N_KEY - 1) {	
+				nonleafnode.insert(ikey, ipid);
+				nonleafnode.write(currentPid, pf);
+				ikey = -1;
+				return 0;
+			}
+			else { //no room in this one
+				BTNonLeafNode siblingnode = BTNonLeafNode();
+				int siblingKey;
+
+				nonleafnode.insertAndSplit(ikey, ipid, siblingnode, siblingKey); //insert and split
+				ikey = siblingKey;
+				ipid = pf.endPid();
+				siblingnode.write(ipid, pf);
+				nonleafnode.write(currentPid, pf);
+				return 1;
+			}
+		}
+		else
+			return 0;
+	}
+
 }
 
 /**
@@ -72,7 +184,34 @@ RC BTreeIndex::insert(int key, const RecordId& rid)
  */
 RC BTreeIndex::locate(int searchKey, IndexCursor& cursor)
 {
-    return 0;
+	//implemented by ACJ 2016/11/12
+	BTLeafNode leafnode = BTLeafNode();
+	BTNonLeafNode nonleafnode = BTNonLeafNode();
+
+	//Initialize
+	PageId pid = rootPid;
+	int eid = -1;
+
+	//NonLeafNode Search
+	if (treeHeight > 1) { 
+		for (int i = 0; i < treeHeight - 1; i++) { 
+			if (nonleafnode.read(pid, pf) < 0) 
+				return EC;
+			if (nonleafnode.locateChildPtr(searchKey, pid) < 0)
+				return EC;
+		}
+	}
+
+	//LeafNode Search
+	if (leafnode.read(pid, pf) < 0)
+		return EC;
+	if (leafnode.locate(searchKey, eid) < 0) 
+		return EC;
+	else { 
+		cursor.pid = pid;
+		cursor.eid = eid;
+	}
+	return 0;
 }
 
 /*
@@ -85,5 +224,33 @@ RC BTreeIndex::locate(int searchKey, IndexCursor& cursor)
  */
 RC BTreeIndex::readForward(IndexCursor& cursor, int& key, RecordId& rid)
 {
-    return 0;
+	//implemented by ACJ 2016/11/12
+	RC rc = 0;
+
+	PageId currentPid = cursor.pid;
+	int currentEid = cursor.eid;
+
+	BTLeafNode currentNode;
+	rc = currentNode.read(cursor.pid, pf);
+	if (rc != 0) {
+		return rc; // RC_FILE_READ_FAILED;
+	}
+
+	rc = currentNode.readEntry(currentEid, key, rid);
+	if (rc != 0) {
+		return rc; // RC_INVALID_CURSOR;
+	}
+
+	// If there is an overflow
+	if (currentEid == currentNode.getKeyCount() - 1) { 
+		//move foward the cursor to the next entry, this case the next node
+		cursor.eid = 0;
+		cursor.pid = currentNode.getNextNodePtr();
+	}
+	else { // there is no overflow issue
+		cursor.eid = ++currentEid;
+		cursor.pid = currentPid;
+	}
+
+	return rc;
 }
