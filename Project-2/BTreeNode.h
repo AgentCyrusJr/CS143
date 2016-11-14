@@ -13,7 +13,7 @@
 #include "RecordFile.h"
 #include "PageFile.h"
 
-#define MAX_KEY_NUM 80; // maximum keys in node
+//#define MAX_KEY_NUM 80; // maximum keys in node
 
 /**
  * BTLeafNode: The class representing a B+tree leaf node.
@@ -22,7 +22,9 @@ class BTLeafNode {
   public:
 
     // maximum keys in node
-    //static const int MAX_KEY_NUM = 80;
+    static const int MAX_KEY_NUM = 80;
+
+    BTLeafNode();
 
    /**
     * Insert the (key, rid) pair to the node.
@@ -113,6 +115,8 @@ class BTLeafNode {
 
     RC write(char* ptr, int size);
 
+    void printNode();
+
   private:
    /**
     * The main memory buffer for loading the content of the disk page 
@@ -129,6 +133,8 @@ class BTNonLeafNode {
   public:
     // maximum keys in node
     static const int MAX_KEY_NUM = 120;
+
+    BTNonLeafNode();
    /**
     * Insert a (key, pid) pair to the node.
     * Remember that all keys inside a B+tree node should be kept sorted.
@@ -136,6 +142,7 @@ class BTNonLeafNode {
     * @param pid[IN] the PageId to insert
     * @return 0 if successful. Return an error code if the node is full.
     */
+    
     RC insert(int key, PageId pid);
 
     RC insertToSlot(int key, const PageId pid, char* ptr, int length);
@@ -200,6 +207,8 @@ class BTNonLeafNode {
     RC write(PageId pid, PageFile& pf);
 
     RC write(char* ptr, int size);
+
+    void printNode();
 
   private:
    /**

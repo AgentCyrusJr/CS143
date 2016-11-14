@@ -9,6 +9,8 @@
  
 #include "BTreeIndex.h"
 #include "BTreeNode.h"
+#include <cstring>
+#include <iostream>
 
 using namespace std;
 
@@ -29,20 +31,26 @@ BTreeIndex::BTreeIndex()
  */
 RC BTreeIndex::open(const string& indexname, char mode)
 {
+	RC rc;
 	char buffer[PageFile::PAGE_SIZE]; 
 	//fail to open
-	if (pf.open(indexname, mode) < 0) 
-		return pf.open(indexname, mode);
+	if ((rc = pf.open(indexname, mode)) < 0) 
+		return rc;
 
 	if (pf.endPid() == 0) {
 		rootPid = -1;
 		treeHeight = 0;
-		close();
-		return open(indexname, mode);
+
+		RC rc;
+		char buffer[PageFile::PAGE_SIZE]; 
+		memcpy(buffer, &rootPid, sizeof(PageId));
+		memcpy(buffer + sizeof(PageId), &treeHeight, sizeof(int));
+		if ((rc = pf.write(0, buffer)) < 0) return rc;
+		return 0;
 	}
 	else {
 		//fail to read
-		if (pf.read(0, buffer) < 0) return pf.read(0, buffer);
+		if ((rc = pf.read(0, buffer)) < 0) return rc;
 
 		memcpy(&rootPid, buffer, sizeof(PageId));
 		memcpy(&treeHeight, buffer + sizeof(PageId), sizeof(int));
@@ -57,11 +65,11 @@ RC BTreeIndex::open(const string& indexname, char mode)
  */
 RC BTreeIndex::close()
 {
+	RC rc;
 	char buffer[PageFile::PAGE_SIZE]; 
 	memcpy(buffer, &rootPid, sizeof(PageId));
 	memcpy(buffer + sizeof(PageId), &treeHeight, sizeof(int));
-	if (pf.write(0, buffer) < 0) 
-		return pf.write(0, buffer);
+	if ((rc = pf.write(0, buffer)) < 0) return rc;
 	return pf.close(); 
 }
 
@@ -78,7 +86,7 @@ RC BTreeIndex::insert(int key, const RecordId& rid)
 		leafnode.insert(key, rid);
 		rootPid = pf.endPid();
 		leafnode.write(rootPid, pf);
-		treeHeight++; 
+		treeHeight++;
 		return 0;
 	}
 	else {
@@ -111,7 +119,7 @@ RC BTreeIndex::helper(int& key, const RecordId& rid, int height, PageId currentP
 		BTLeafNode leafnode = BTLeafNode();
 		leafnode.read(currentPid, pf);
 		//There is enough space for this insertion in the leafnode
-		if (leafnode.getKeyCount() < MAX_KEY_NUM -1) { //Max. number of keys for leaf nodes	
+		if (leafnode.getKeyCount() < BTLeafNode::MAX_KEY_NUM -1) { //Max. number of keys for leaf nodes	
 			leafnode.insert(key, rid);
 			leafnode.write(currentPid, pf);
 			return 0;
@@ -121,7 +129,6 @@ RC BTreeIndex::helper(int& key, const RecordId& rid, int height, PageId currentP
 
 			leafnode.insertAndSplit(key, rid, siblingnode, ikey); 
 			ipid = pf.endPid();
-			siblingnode.setNextNodePtr(leafnode.getNextNodePtr());
 			leafnode.setNextNodePtr(ipid);
 			leafnode.write(currentPid, pf);
 			siblingnode.write(ipid, pf);
@@ -140,7 +147,7 @@ RC BTreeIndex::helper(int& key, const RecordId& rid, int height, PageId currentP
 			return -1;
 		else if (result == 1) { //if overflow
 			//enough space for this node
-			if (nonleafnode.getKeyCount() < MAX_KEY_NUM - 1) {
+			if (nonleafnode.getKeyCount() < BTNonLeafNode::MAX_KEY_NUM - 1) {
 				nonleafnode.insert(ikey, ipid);
 				nonleafnode.write(currentPid, pf);
 				ikey = -1;
@@ -196,17 +203,17 @@ RC BTreeIndex::locate(int searchKey, IndexCursor& cursor)
 	if (treeHeight > 1) { 
 		for (int i = 0; i < treeHeight - 1; i++) { 
 			if (nonleafnode.read(pid, pf) < 0) 
-				return EC;
+				return RC_NO_SUCH_RECORD;
 			if (nonleafnode.locateChildPtr(searchKey, pid) < 0)
-				return EC;
+				return RC_NO_SUCH_RECORD;
 		}
 	}
 
 	//LeafNode Search
 	if (leafnode.read(pid, pf) < 0)
-		return EC;
+		return RC_NO_SUCH_RECORD;
 	if (leafnode.locate(searchKey, eid) < 0) 
-		return EC;
+		return RC_NO_SUCH_RECORD;
 	else { 
 		cursor.pid = pid;
 		cursor.eid = eid;
@@ -231,15 +238,10 @@ RC BTreeIndex::readForward(IndexCursor& cursor, int& key, RecordId& rid)
 	int currentEid = cursor.eid;
 
 	BTLeafNode currentNode;
-	rc = currentNode.read(cursor.pid, pf);
-	if (rc != 0) {
-		return rc; // RC_FILE_READ_FAILED;
-	}
+	if ((rc = currentNode.read(cursor.pid, pf)) < 0) return rc; // RC_FILE_READ_FAILED;
 
 	rc = currentNode.readEntry(currentEid, key, rid);
-	if (rc != 0) {
-		return rc; // RC_INVALID_CURSOR;
-	}
+	if ((rc = currentNode.readEntry(currentEid, key, rid)) < 0) return rc; // RC_INVALID_CURSOR;
 
 	// If there is an overflow
 	if (currentEid == currentNode.getKeyCount() - 1) { 
@@ -253,4 +255,18 @@ RC BTreeIndex::readForward(IndexCursor& cursor, int& key, RecordId& rid)
 	}
 
 	return rc;
+}
+
+
+PageId BTreeIndex::getRootPid()
+{
+	return rootPid;
+}
+
+int BTreeIndex::getHeight(){
+	return treeHeight;
+}
+
+PageFile BTreeIndex::getPageFile(){
+	return pf;
 }

@@ -13,8 +13,7 @@
 #include "Bruinbase.h"
 #include "PageFile.h"
 #include "RecordFile.h"
-   
-#define EC -100     // ERROR CODE
+
 /**
  * The data structure to point to a particular entry at a b+tree leaf node.
  * An IndexCursor consists of pid (PageId of the leaf node) and 
@@ -60,7 +59,7 @@ class BTreeIndex {
   RC insert(int key, const RecordId& rid);
 
 
-  RC BTreeIndex::helper(int& key, const RecordId& rid, int height, PageId currentPid, int& ikey, PageId& ipid);
+  RC helper(int& key, const RecordId& rid, int height, PageId currentPid, int& ikey, PageId& ipid);
   /**
    * Run the standard B+Tree key search algorithm and identify the
    * leaf node where searchKey may exist. If an index entry with
@@ -90,6 +89,12 @@ class BTreeIndex {
    * @return error code. 0 if no error
    */
   RC readForward(IndexCursor& cursor, int& key, RecordId& rid);
+
+  PageId getRootPid();
+
+  int getHeight();
+
+  PageFile getPageFile();
   
  private:
   PageFile pf;         /// the PageFile used to store the actual b+tree in disk

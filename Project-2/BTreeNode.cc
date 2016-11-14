@@ -1,5 +1,7 @@
 #include "BTreeNode.h"
 #include <cstring>
+#include <iostream>
+
 
 using namespace std;
 
@@ -21,6 +23,10 @@ static void setNextPtr(char* page, PageId pid);
  * @param pf[IN] PageFile to read from
  * @return 0 if successful. Return an error code if there is an error.
  */
+BTLeafNode::BTLeafNode() {
+	memset(buffer, 0, PageFile::PAGE_SIZE);
+}
+
 RC BTLeafNode::read(PageId pid, const PageFile& pf)
 { 
 	return pf.read(pid, buffer);
@@ -39,7 +45,7 @@ RC BTLeafNode::write(PageId pid, PageFile& pf)
 
 RC BTLeafNode::write(char* ptr, int size)
 {
-	memcpy(buffer, ptr, (sizeof(int) + sizeof(RecordId)) * size);
+	memcpy(buffer+sizeof(int), ptr, (sizeof(int) + sizeof(RecordId)) * size);
 	setNodeKeyCount(buffer, size);
 	return 0;
 }
@@ -70,9 +76,17 @@ RC BTLeafNode::insertToNode(int key, const RecordId& rid)
 {
 	int total = BTLeafNode::getKeyCount();
 
+	if (total == 0) {
+		char *ptr = BTLeafNode::slotPtr(0);
+		memcpy(ptr, &key, sizeof(int));
+		memcpy(ptr+sizeof(int), &rid, sizeof(RecordId));
+		setNodeKeyCount(buffer, total + 1);
+		return 0;
+	}
+
 	int begin = 0, end = total - 1, k;
 
-	while (begin = end) {
+	while (begin < end) {
 		int mid = begin + (end - begin) / 2;
 		char *ptr = BTLeafNode::slotPtr(mid);
 		memcpy(&k, ptr, sizeof(int));
@@ -172,7 +186,7 @@ RC BTLeafNode::binaryLocate(int searchKey, int& eid, int begin, int end)
 		return 0;
 	}
 
-	if (key > searchKey) {
+	if (key < searchKey) {
 		return BTLeafNode::binaryLocate(searchKey, eid, mid+1, end);
 	} else {
 		return BTLeafNode::binaryLocate(searchKey, eid, begin, mid-1);
@@ -223,6 +237,23 @@ RC BTLeafNode::setNextNodePtr(PageId pid)
 	return 0;
 }
 
+void BTLeafNode::printNode()
+{
+	int key;
+	for (int i = 0; i < BTLeafNode::getKeyCount(); i++) {
+		char *ptr = BTLeafNode::slotPtr(i);
+		memcpy(&key, ptr, sizeof(int));
+		std::cout<<" "<<key;
+
+	}
+	std::cout<<std::endl;
+}
+
+
+BTNonLeafNode::BTNonLeafNode() {
+	memset(buffer, 0, PageFile::PAGE_SIZE);
+}
+
 /*
  * Read the content of the node from the page pid in the PageFile pf.
  * @param pid[IN] the PageId to read
@@ -247,7 +278,7 @@ RC BTNonLeafNode::write(PageId pid, PageFile& pf)
 
 RC BTNonLeafNode::write(char* ptr, int size)
 {
-	memcpy(buffer, ptr, sizeof(PageId) + (sizeof(int) + sizeof(PageId)) * size);
+	memcpy(buffer+sizeof(int), ptr, sizeof(PageId) + (sizeof(int) + sizeof(PageId)) * size);
 	setNodeKeyCount(buffer, size);
 	return 0;
 }
@@ -353,7 +384,7 @@ RC BTNonLeafNode::insertAndSplit(int key, PageId pid, BTNonLeafNode& sibling, in
 	char *ptr = BTNonLeafNode::slotPtr(count/2);
 	memcpy(&midKey, ptr, sizeof(int));
 
-	sibling.write(ptr + sizeof(int), count - count/2 -1);
+	sibling.write(ptr - sizeof(int), count - count/2);
 	setNodeKeyCount(buffer, count/2);
 	return 0;
 }
@@ -412,6 +443,27 @@ RC BTNonLeafNode::initializeRoot(PageId pid1, int key, PageId pid2)
 
 	memcpy(buffer+sizeof(int), &pid1, sizeof(int));
 	BTNonLeafNode::insert(key, pid2);
+}
+
+void BTNonLeafNode::printNode()
+{
+	int key,pageId;
+	if (BTNonLeafNode::getKeyCount()>0) 
+	{
+		char *ptr = BTNonLeafNode::slotPtr(0);
+		memcpy(&pageId, ptr - sizeof(PageId), sizeof(PageId));
+		std::cout<<" "<<pageId;
+	}
+	for (int i = 0; i < BTNonLeafNode::getKeyCount(); i++) 
+	{
+		char *ptr = BTNonLeafNode::slotPtr(i);
+		memcpy(&key, ptr, sizeof(int));
+		std::cout<<" *"<<key<<"*";
+		memcpy(&pageId, ptr + sizeof(int), sizeof(PageId));
+		std::cout<<" "<<pageId;
+
+	}
+	std::cout<<std::endl;
 }
 
 static int getNodeKeyCount(const char* page)
