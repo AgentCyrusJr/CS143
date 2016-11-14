@@ -237,19 +237,6 @@ RC BTLeafNode::setNextNodePtr(PageId pid)
 	return 0;
 }
 
-void BTLeafNode::printNode()
-{
-	int key;
-	for (int i = 0; i < BTLeafNode::getKeyCount(); i++) {
-		char *ptr = BTLeafNode::slotPtr(i);
-		memcpy(&key, ptr, sizeof(int));
-		std::cout<<" "<<key;
-
-	}
-	std::cout<<std::endl;
-}
-
-
 BTNonLeafNode::BTNonLeafNode() {
 	memset(buffer, 0, PageFile::PAGE_SIZE);
 }
@@ -443,27 +430,6 @@ RC BTNonLeafNode::initializeRoot(PageId pid1, int key, PageId pid2)
 
 	memcpy(buffer+sizeof(int), &pid1, sizeof(int));
 	BTNonLeafNode::insert(key, pid2);
-}
-
-void BTNonLeafNode::printNode()
-{
-	int key,pageId;
-	if (BTNonLeafNode::getKeyCount()>0) 
-	{
-		char *ptr = BTNonLeafNode::slotPtr(0);
-		memcpy(&pageId, ptr - sizeof(PageId), sizeof(PageId));
-		std::cout<<" "<<pageId;
-	}
-	for (int i = 0; i < BTNonLeafNode::getKeyCount(); i++) 
-	{
-		char *ptr = BTNonLeafNode::slotPtr(i);
-		memcpy(&key, ptr, sizeof(int));
-		std::cout<<" *"<<key<<"*";
-		memcpy(&pageId, ptr + sizeof(int), sizeof(PageId));
-		std::cout<<" "<<pageId;
-
-	}
-	std::cout<<std::endl;
 }
 
 static int getNodeKeyCount(const char* page)

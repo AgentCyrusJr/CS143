@@ -13,14 +13,47 @@
 #include <cassert>
 #include <cstring>
 #include <fstream>
-#include <stdlib.h> 
+#include <stdlib.h>
+#include <time.h>
 
 using namespace std;
+
+void BTLeafNodeTest::printNode()
+{
+  int key;
+  for (int i = 0; i < getKeyCount(); i++) {
+    char *ptr = slotPtr(i);
+    memcpy(&key, ptr, sizeof(int));
+    std::cout<<" "<<key;
+  }
+  std::cout<<std::endl;
+};
+
+void BTNonLeafNodeTest::printNode()
+{
+  int key,pageId;
+  if (getKeyCount()>0) 
+  {
+    char *ptr = slotPtr(0);
+    memcpy(&pageId, ptr - sizeof(PageId), sizeof(PageId));
+    std::cout<<" "<<pageId;
+  }
+  for (int i = 0; i < getKeyCount(); i++) 
+  {
+    char *ptr = slotPtr(i);
+    memcpy(&key, ptr, sizeof(int));
+    std::cout<<" *"<<key<<"*";
+    memcpy(&pageId, ptr + sizeof(int), sizeof(PageId));
+    std::cout<<" "<<pageId;
+
+  }
+  std::cout<<std::endl;
+};
 
 int main()
 {
   string testIndex = "test.tbl";
-  BTIndexTest btree;
+  BTreeIndex btree;
   std::remove(testIndex.c_str());
   //init test
   btree.open("test.tbl", 'w');
@@ -41,6 +74,7 @@ int main()
   //test insert root
 
   int keyArray[MAX_TUPLE];
+  srand (time(NULL));
   for (int i = 1; i < MAX_TUPLE+1; i++) 
   {
       keyArray[i-1] = i;
@@ -57,7 +91,7 @@ int main()
   assert(btree.getHeight()==1);
   assert(btree.getRootPid()==1);
   assert(btree.getPageFile().endPid()==2);
-  BTLeafNode leafnode = BTLeafNode();
+  BTLeafNodeTest leafnode = BTLeafNodeTest();
   leafnode.read(btree.getRootPid(),btree.getPageFile());
   assert(leafnode.getKeyCount()==1);
 
@@ -101,7 +135,7 @@ int main()
   assert(btree.getHeight()==2);
   assert(btree.getRootPid()==3);
 
-  BTNonLeafNode parentnode = BTNonLeafNode();
+  BTNonLeafNodeTest parentnode = BTNonLeafNodeTest();
   parentnode.read(btree.getRootPid(),btree.getPageFile());
   assert(parentnode.getKeyCount()==1);
   
@@ -139,7 +173,7 @@ int main()
     btree.insert(keyArray[i-1],rid);
   }
   assert(btree.getHeight()==3);
-  
+
   for (int i = 1; i<MAX_TUPLE+1; i++)
   {
     rid.pid = i;

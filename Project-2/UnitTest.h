@@ -14,31 +14,18 @@
 #include "BTreeIndex.h"
 #include "BTreeNode.h"
 
-#define UNIT_TEST_RANDOM_MAX 200
-#define UNIT_TEST_RANDOM_MIN 0
 #define MAX_TUPLE 12000
-
-class BTIndexTest : public BTreeIndex
-{
-public:    
-        void print() 
-        {
-        }
-};
 
 class BTLeafNodeTest : public BTLeafNode
 {
 public:    
-        void print() 
-        {
-        }
+  void printNode();
 };
 
 class BTNonLeafNodeTest : public BTNonLeafNode
 {
-        void print( ) 
-        {
-        }
+public:
+  void printNode();
 };
 
 
