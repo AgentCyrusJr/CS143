@@ -12,6 +12,8 @@
 
 #include <vector>
 #include "Bruinbase.h"
+#include "BTreeIndex.h"
+#include "BTreeNode.h"
 #include "RecordFile.h"
 
 /**
