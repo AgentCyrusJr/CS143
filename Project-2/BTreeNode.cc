@@ -25,6 +25,7 @@ static void setNextPtr(char* page, PageId pid);
  */
 BTLeafNode::BTLeafNode() {
 	memset(buffer, 0, PageFile::PAGE_SIZE);
+	setNextNodePtr(-1);
 }
 
 RC BTLeafNode::read(PageId pid, const PageFile& pf)
@@ -174,6 +175,7 @@ RC BTLeafNode::binaryLocate(int searchKey, int& eid, int begin, int end)
 {
 	int key;
 	if (begin > end) {
+		eid = begin;
 		return RC_NO_SUCH_RECORD;
 	}
 
@@ -236,6 +238,8 @@ RC BTLeafNode::setNextNodePtr(PageId pid)
 	setNextPtr(buffer, pid);
 	return 0;
 }
+
+
 
 BTNonLeafNode::BTNonLeafNode() {
 	memset(buffer, 0, PageFile::PAGE_SIZE);
@@ -461,3 +465,35 @@ static void setNextPtr(char* page, PageId pid)
   // the first four bytes of a page contains # records in the page
   memcpy(page+PageFile::PAGE_SIZE-sizeof(int), &pid, sizeof(int));
 }
+
+void BTLeafNode::printNode()
+{
+  int key;
+  for (int i = 0; i < getKeyCount(); i++) {
+    char *ptr = slotPtr(i);
+    memcpy(&key, ptr, sizeof(int));
+    std::cout<<" "<<key;
+  }
+  std::cout<<std::endl;
+};
+
+void BTNonLeafNode::printNode()
+{
+  int key,pageId;
+  if (getKeyCount()>0) 
+  {
+    char *ptr = slotPtr(0);
+    memcpy(&pageId, ptr - sizeof(PageId), sizeof(PageId));
+    std::cout<<" "<<pageId;
+  }
+  for (int i = 0; i < getKeyCount(); i++) 
+  {
+    char *ptr = slotPtr(i);
+    memcpy(&key, ptr, sizeof(int));
+    std::cout<<" *"<<key<<"*";
+    memcpy(&pageId, ptr + sizeof(int), sizeof(PageId));
+    std::cout<<" "<<pageId;
+
+  }
+  std::cout<<std::endl;
+};

@@ -63,22 +63,16 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
   count = 0;
   int search_key = 0;
   if (btreeindex.open(table + ".idx", 'r') == 0) { //index : true 
-	  int eq = SelCond::EQ;
-	  int ne = SelCond::NE;
-	  int lt = SelCond::LT;
-	  int gt = SelCond::GT;
-	  int le = SelCond::LE;
-	  int ge = SelCond::GE;
 
 	  //set a loop to scan for the conditions in the array
 	  for (int i = 0; i < cond.size(); i++) { 
 		  if (cond[i].attr != 1)   // attr == 2 means value
 			  continue;
-		  else if (cond[i].comp == eq) {
+		  else if (cond[i].comp == SelCond::EQ) {
 			  search_key = atoi(cond[i].value);
 			  break;
 		  }
-		  else if (cond[i].comp == ge) {
+		  else if (cond[i].comp == SelCond::GE) {
 			  if (search_key == 0) {
 				  search_key = atoi(cond[i].value);
 				  continue;
@@ -87,9 +81,9 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
 			  if (compareval > search_key)
 				  search_key = compareval;
 		  }
-		  else if (cond[i].comp == gt) {
+		  else if (cond[i].comp == SelCond::GT) {
 			  if (search_key == 0) {
-				  search_key = atoi(cond[i].value);
+				  search_key = atoi(cond[i].value) + 1;
 				  continue;
 			  }
 			  int compareval = atoi(cond[i].value) + 1;
@@ -102,11 +96,9 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
 	  btreeindex.locate(search_key, cursor);
 
 	  while (btreeindex.readForward(cursor, key, rid) == 0) { 
-		  if (attr != 4) { //we don't want values when doing count(*)
-			  if ((rc = rf.read(rid, key, value)) < 0) {
-				  fprintf(stderr, "Error: while reading a tuple from table %s\n", table.c_str());
-				  goto exit_select;
-			  }
+		  if ((rc = rf.read(rid, key, value)) < 0) {
+		 	fprintf(stderr, "Error: while reading a tuple from table %s\n", table.c_str());
+			goto exit_select;
 		  }
 		  // check the conditions on the tuple
 		  for (unsigned i = 0; i < cond.size(); i++) {
@@ -125,26 +117,26 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
 			  case SelCond::EQ:
 				  if (diff != 0)
 					  if (cond[i].attr == 1) goto exit_select; 
-					  else continue; 
+					  else goto next_index;
 				  break;
 			  case SelCond::NE:
-				  if (diff == 0) continue;
+				  if (diff == 0) goto next_index;
 				  break;
 			  case SelCond::GT: // no duplicate tolerance
-				  if (diff <= 0) continue;
+				  if (diff <= 0) goto next_index;
 				  break;
 			  case SelCond::LT:
 				  if (diff >= 0) // no duplicate tolerance
 					  if (cond[i].attr == 1) goto exit_select; 
-					  else continue; 
+					  else goto next_index;
 				  break;
 			  case SelCond::GE:
-				  if (diff < 0) continue;
+				  if (diff < 0) goto next_index;
 				  break;
 			  case SelCond::LE:
 				  if (diff > 0) 
 					  if (cond[i].attr == 1) goto exit_select; 
-					  else continue;
+					  else goto next_index;
 				  break;
 			  }
 		  }
@@ -165,6 +157,8 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
 			  fprintf(stdout, "%d '%s'\n", key, value.c_str());
 			  break;
 		  }
+
+		  next_index:;
 	  }
   }
   else
@@ -279,10 +273,9 @@ RC SqlEngine::load(const string& table, const string& loadfile, bool index)
 		while (!current_file.eof()) {
 			getline(current_file, current_line);
 			//SqlEngine::parseLoadLine
+			if (current_line == "") continue;
 			parseLoadLine(current_line, key, value);
 			new_table.append(key, value, rid);
-			rid++;
-
 			if (index) { 
 				rc = btreeindex.insert(key, rid);
 				if (rc != 0) {
@@ -292,6 +285,7 @@ RC SqlEngine::load(const string& table, const string& loadfile, bool index)
 					return rc;
 				}
 			}
+			rid++;
 
 		}
 	}
