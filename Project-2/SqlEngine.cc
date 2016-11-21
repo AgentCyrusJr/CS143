@@ -47,6 +47,7 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
   string value;
   int    count;
   int    diff;
+  bool   onlyKey = true;
 
   BTreeIndex btreeindex;
   IndexCursor cursor;
@@ -66,8 +67,10 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
 
 	  //set a loop to scan for the conditions in the array
 	  for (int i = 0; i < cond.size(); i++) { 
-		  if (cond[i].attr != 1)   // attr == 2 means value
+		  if (cond[i].attr != 1) {  // attr == 2 means value
+		  	  onlyKey = false;
 			  continue;
+		  }
 		  else if (cond[i].comp == SelCond::EQ) {
 			  search_key = atoi(cond[i].value);
 			  break;
@@ -90,16 +93,19 @@ RC SqlEngine::select(int attr, const string& table, const vector<SelCond>& cond)
 			  if (compareval > search_key)
 				  search_key = compareval;
 		  }
+
 		  //we don't need to compare when case is lt or le, since we will pick 
 		  //always the front element until the search key
 	  }
+
 	  btreeindex.locate(search_key, cursor);
 
 	  while (btreeindex.readForward(cursor, key, rid) == 0) { 
-		  if ((rc = rf.read(rid, key, value)) < 0) {
-		 	fprintf(stderr, "Error: while reading a tuple from table %s\n", table.c_str());
-			goto exit_select;
-		  }
+	  	  if (!(onlyKey && (attr == 1 || attr == 4)))
+			  if ((rc = rf.read(rid, key, value)) < 0) {
+			 	fprintf(stderr, "Error: while reading a tuple from table %s\n", table.c_str());
+				goto exit_select;
+			  }
 		  // check the conditions on the tuple
 		  for (unsigned i = 0; i < cond.size(); i++) {
 			  // difference between the tuple value and the condition value
