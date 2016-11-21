@@ -129,6 +129,7 @@ RC BTreeIndex::helper(int& key, const RecordId& rid, int height, PageId currentP
 
 			leafnode.insertAndSplit(key, rid, siblingnode, ikey); 
 			ipid = pf.endPid();
+			siblingnode.setNextNodePtr(leafnode.getNextNodePtr());
 			leafnode.setNextNodePtr(ipid);
 			leafnode.write(currentPid, pf);
 			siblingnode.write(ipid, pf);
