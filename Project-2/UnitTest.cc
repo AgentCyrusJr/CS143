@@ -133,7 +133,7 @@ int main()
   rid.sid = BTLeafNode::MAX_KEY_NUM+1;
   btree.insert(keyArray[BTLeafNode::MAX_KEY_NUM-1],rid);
   assert(btree.getHeight()==2);
-  assert(btree.getRootPid()==3);
+  assert(btree.getRootPid()==1);
 
   BTNonLeafNodeTest parentnode = BTNonLeafNodeTest();
   parentnode.read(btree.getRootPid(),btree.getPageFile());
@@ -144,7 +144,7 @@ int main()
   int leftP,rightP;
   memcpy(&leftP, ptr - sizeof(PageId), sizeof(PageId));
   memcpy(&rightP, ptr + sizeof(PageId), sizeof(PageId));
-  assert(leftP==1);
+  assert(leftP==3);
   assert(rightP==2);
   leafnode.read(leftP,btree.getPageFile());
   assert(leafnode.getKeyCount()==BTLeafNode::MAX_KEY_NUM/2);

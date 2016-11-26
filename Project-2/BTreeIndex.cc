@@ -96,8 +96,11 @@ RC BTreeIndex::insert(int key, const RecordId& rid)
 		//if the inserted node is to split first 
 		if (result == 1) { 
 			BTNonLeafNode parentnode = BTNonLeafNode();
-			parentnode.initializeRoot(rootPid, ikey, ipid);
-			rootPid = pf.endPid();
+			BTLeafNode leafnode = BTLeafNode();
+			leafnode.read(rootPid, pf);
+			int newleft = pf.endPid();
+			leafnode.write(newleft, pf);
+			parentnode.initializeRoot(newleft, ikey, ipid);
 			parentnode.write(rootPid, pf);
 			treeHeight++;
 			return 0;

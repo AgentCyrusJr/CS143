@@ -22,7 +22,7 @@ class BTLeafNode {
   public:
 
     // maximum keys in node
-    static const int MAX_KEY_NUM = 80;
+    static const int MAX_KEY_NUM = 84;
 
     BTLeafNode();
 
@@ -132,7 +132,7 @@ class BTLeafNode {
 class BTNonLeafNode {
   public:
     // maximum keys in node
-    static const int MAX_KEY_NUM = 120;
+    static const int MAX_KEY_NUM = 127;
 
     BTNonLeafNode();
    /**
