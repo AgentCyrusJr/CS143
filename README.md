@@ -17,3 +17,7 @@ Yukai Tu fixed some problems and pulled all required documents on this repositor
 Finished P1C, waiting for submission. Further testcases need to be designed to check its correctness. 
 
 ================update on 10/31/2016================
+
+Finished bruinbase finally. This update is written after the final exam of CS143.
+
+================update on 12/08/2016================
